@@ -13,7 +13,8 @@ class App extends Component {
             parentMenu: [],
             selectedItem: "Learn",
             hoveredItem: menu[0].name,
-            backgroundColorchild: 0
+            backgroundColorchild: 0,
+            previousParent: null
         };
         this.hover = this.hover.bind(this);
         this.rgb = this.fillColorArray(menu.length);
@@ -35,6 +36,10 @@ class App extends Component {
     menuItemClicked(order) {
         if (order.data[0].data) {
             this.setState({
+                previousParent:
+                    this.state.parentMenu.length === 0
+                        ? "Learn"
+                        : this.state.parentMenu,
                 parentMenu: this.state.currentMenu,
                 currentMenu: order.data,
                 hovered: order.data[0].data,
@@ -46,6 +51,11 @@ class App extends Component {
     ChildmenuItemClicked(order) {
         if (order.data) {
             this.setState({
+                selectedItem: this.state.hovered[0].name,
+                previousParent:
+                    this.state.parentMenu.length === 0
+                        ? "Learn"
+                        : this.state.parentMenu,
                 parentMenu: this.state.currentMenu,
                 currentMenu: this.state.hovered,
                 hovered: this.state.hovered[0].data,
@@ -79,20 +89,7 @@ class App extends Component {
         }
         return rgb;
     }
-    // getBackgroundColor(length, index) {
-    //     const rgb = [
-    //         "#800040",
-    //         "#433622",
-    //         "#424949",
-    //         "#4a235a",
-    //         "#154360",
-    //         "#21618c"
-    //     ];
-    //     if (i < 6) return rgb[i];
-    //     else {
-    //         return rgb[i % 6];
-    //     }
-    // }
+
     getRandomColor() {
         var letters = "0123456789ABCDEF";
         var color = "#";
@@ -128,10 +125,38 @@ class App extends Component {
         );
     }
 
+    backPress() {
+        console.log(this.state.currentMenu, "^^^^");
+        this.setState({
+            selectedItem: "Learn",
+            hovered: this.state.currentMenu,
+            hoveredItem: this.state.parentMenu[0].name,
+            currentMenu: this.state.parentMenu,
+            parentMenu:
+                this.state.previousParent === "Learn"
+                    ? [{ name: this.state.previousParent }]
+                    : this.state.previousParent,
+            previousParent: null
+        });
+    }
+
     render() {
+        console.log(this.state.selectedItem);
         return (
             <div className="App">
                 <div className="Header">
+                    {this.state.selectedItem !== "Learn" ? (
+                        <button className="backButton">
+                            <i
+                                className="fa fa-arrow-left"
+                                aria-hidden="true"
+                                onClick={() => {
+                                    this.backPress();
+                                }}
+                            />
+                        </button>
+                    ) : null}
+
                     <div className="parent-name">
                         {this.state.parentMenu.length !== 0 ? (
                             <select
